@@ -1,0 +1,2 @@
+/usr/bin/ar qc libh264_vp_ec.a "CMakeFiles/h264_vp_ec.dir/mnt/d/CDC-VP/components/h264/ec/src/ec_top.cpp.o" "CMakeFiles/h264_vp_ec.dir/mnt/d/CDC-VP/components/h264/ec/src/cavlc.cpp.o" "CMakeFiles/h264_vp_ec.dir/mnt/d/CDC-VP/components/h264/ec/src/cabac.cpp.o" "CMakeFiles/h264_vp_ec.dir/mnt/d/CDC-VP/components/h264/ec/src/exp_golomb.cpp.o" "CMakeFiles/h264_vp_ec.dir/mnt/d/CDC-VP/components/h264/ec/src/nal_formatter.cpp.o" "CMakeFiles/h264_vp_ec.dir/mnt/d/CDC-VP/components/h264/ec/src/syntax_builder.cpp.o"
+/usr/bin/ranlib libh264_vp_ec.a

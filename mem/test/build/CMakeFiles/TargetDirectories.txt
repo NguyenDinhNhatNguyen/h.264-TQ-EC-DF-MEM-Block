@@ -1,0 +1,5 @@
+/mnt/d/CDC-VP/components/h264/mem/test/build/CMakeFiles/h264_vp_mem.dir
+/mnt/d/CDC-VP/components/h264/mem/test/build/CMakeFiles/test_h264_vp_mem.dir
+/mnt/d/CDC-VP/components/h264/mem/test/build/CMakeFiles/test.dir
+/mnt/d/CDC-VP/components/h264/mem/test/build/CMakeFiles/edit_cache.dir
+/mnt/d/CDC-VP/components/h264/mem/test/build/CMakeFiles/rebuild_cache.dir

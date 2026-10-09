@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/mnt/d/CDC-VP/components/h264/ec/test/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

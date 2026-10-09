@@ -1,0 +1,2 @@
+/usr/bin/ar qc libh264_vp_mem.a "CMakeFiles/h264_vp_mem.dir/mnt/d/CDC-VP/components/h264/mem/src/memory_map.cpp.o" "CMakeFiles/h264_vp_mem.dir/mnt/d/CDC-VP/components/h264/mem/src/internal_memory.cpp.o" "CMakeFiles/h264_vp_mem.dir/mnt/d/CDC-VP/components/h264/mem/src/external_memory.cpp.o"
+/usr/bin/ranlib libh264_vp_mem.a
