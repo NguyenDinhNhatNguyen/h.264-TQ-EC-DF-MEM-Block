@@ -1,2 +1,0 @@
-/usr/bin/ar qc libh264_vp_tq.a "CMakeFiles/h264_vp_tq.dir/mnt/d/CDC-VP/components/h264/tq/src/tq_top.cpp.o" "CMakeFiles/h264_vp_tq.dir/mnt/d/CDC-VP/components/h264/tq/src/ftq.cpp.o" "CMakeFiles/h264_vp_tq.dir/mnt/d/CDC-VP/components/h264/tq/src/itq.cpp.o" "CMakeFiles/h264_vp_tq.dir/mnt/d/CDC-VP/components/h264/tq/src/transpose_ram.cpp.o"
-/usr/bin/ranlib libh264_vp_tq.a

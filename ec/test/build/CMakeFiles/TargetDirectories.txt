@@ -1,5 +1,0 @@
-/mnt/d/CDC-VP/components/h264/ec/test/build/CMakeFiles/h264_vp_ec.dir
-/mnt/d/CDC-VP/components/h264/ec/test/build/CMakeFiles/test_h264_vp_ec.dir
-/mnt/d/CDC-VP/components/h264/ec/test/build/CMakeFiles/test.dir
-/mnt/d/CDC-VP/components/h264/ec/test/build/CMakeFiles/edit_cache.dir
-/mnt/d/CDC-VP/components/h264/ec/test/build/CMakeFiles/rebuild_cache.dir

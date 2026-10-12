@@ -1,1 +1,0 @@
-/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/test_h264_vp_tq.dir/link.d CMakeFiles/test_h264_vp_tq.dir/test_tq.cpp.o -o test_h264_vp_tq  -Wl,-rpath,/usr/local/systemc-2.3.4/lib libh264_vp_tq.a /usr/local/systemc-2.3.4/lib/libsystemc.so.2.3.4

@@ -1,0 +1,165 @@
+[0;34m==================================================[0m
+[0;34m   H.264 VIDEO PROCESSING - BUILD & RUN ALL       [0m
+[0;34m==================================================[0m
+
+[1;33m[BUILDING] Đang cập nhật và biên dịch khối TQ...[0m
+CMake Error: Unknown argument -q
+CMake Error: Run 'cmake --help' for all supported options.
+[ 71%] Built target h264_vp_tq
+[100%] Built target test_h264_vp_tq
+[0;34m[TESTING] Đang chạy Unit Test cho khối TQ...[0m
+
+        SystemC 2.3.4-Accellera --- Oct  9 2026 11:00:33
+        Copyright (c) 1996-2022 by all Contributors,
+        ALL RIGHTS RESERVED
+
+========================================
+H.264 TRANSFORM & QUANTIZATION UNIT TEST
+========================================
+ -> TQ block xử lý hoàn tất (Valid = 1)
+
+  [Residual Input (Từ Intra/Inter)]:
+       32    12   -10     4 
+       15    -5     0     2 
+       -8     3     1     0 
+        4     0     0     0 
+  [Predictor Input]:
+      128   128   128   128 
+      128   128   128   128 
+      128   128   128   128 
+      128   128   128   128 
+  --------------------------------
+  [Quantized Levels (Xuất cho EC)]:
+        0     0     0     0 
+        0     0     0     0 
+        0     0     0     0 
+        0     0     0     0 
+  [Reconstructed Block (Lưu vào Memory)]:
+      128   128   128   128 
+      128   128   128   128 
+      128   128   128   128 
+      128   128   128   128 
+
+----------------------------------------
+ Kiểm tra trường hợp biên...
+ -> Xử lý thành công khi Residual = 0 hoàn toàn.
+ -> Test Max Residual (255) + Min QP (0) không bị tràn số.
+----------------------------------------
+
+>>> TQ VP FULL FUNCTIONAL TEST PASSED <<<
+
+
+Info: /OSCI/SystemC: Simulation stopped by user.
+[0;32m[SUCCESS] Khối TQ PASSED toàn bộ kịch bản![0m
+
+[1;33m[BUILDING] Đang cập nhật và biên dịch khối EC...[0m
+CMake Error: Unknown argument -q
+CMake Error: Run 'cmake --help' for all supported options.
+[ 77%] Built target h264_vp_ec
+[100%] Built target test_h264_vp_ec
+[0;34m[TESTING] Đang chạy Unit Test cho khối EC...[0m
+
+        SystemC 2.3.4-Accellera --- Oct  9 2026 11:00:33
+        Copyright (c) 1996-2022 by all Contributors,
+        ALL RIGHTS RESERVED
+
+==============================
+H.264 ENTROPY CODING UNIT TEST
+==============================
+ -> [CAVLC / Exp-Golomb] Mã hóa thành công. Length: 8 bytes.
+    Bitstream (hex): 00 00 00 01 ad 04 15 26 
+
+ -> [CABAC Engine] Mã hóa thành công. Length: 9 bytes.
+    Bitstream (hex): 00 00 00 01 ad 45 fd 5b e0 
+
+----------------------------------------
+Kiểm tra trường hợp biên...
+ -> [CAVLC / Complex Data Stress Test] Mã hóa thành công. Length: 19 bytes.
+    Bitstream (hex): 00 00 00 01 ad 03 c1 90 a0 44 70 d1 42 4c 54 c8 71 02 c0 
+
+ -> [CAVLC / Zero Run Length Test] Mã hóa thành công. Length: 7 bytes.
+    Bitstream (hex): 00 00 00 01 ad 0c c0 
+
+----------------------------------------
+>>> EC VP ALL UNIT TESTS PASSED <<<
+
+
+Info: /OSCI/SystemC: Simulation stopped by user.
+[0;32m[SUCCESS] Khối EC PASSED toàn bộ kịch bản![0m
+
+[1;33m[BUILDING] Đang cập nhật và biên dịch khối DF...[0m
+CMake Error: Unknown argument -q
+CMake Error: Run 'cmake --help' for all supported options.
+[ 66%] Built target h264_vp_df
+[100%] Built target test_h264_vp_df
+[0;34m[TESTING] Đang chạy Unit Test cho khối DF...[0m
+
+        SystemC 2.3.4-Accellera --- Oct  9 2026 11:00:33
+        Copyright (c) 1996-2022 by all Contributors,
+        ALL RIGHTS RESERVED
+
+=================================
+H.264 DEBLOCKING FILTER UNIT TEST
+=================================
+  Lệch gắt: 50 | 200, bS=4 -> Kỳ vọng làm mờ về 125:
+     50  50  50 125  | 125 200 200 200 
+     50  50  50 125  | 125 200 200 200 
+     50  50  50 125  | 125 200 200 200 
+     50  50  50 125  | 125 200 200 200 
+
+----------------------------------------
+Kiểm tra trường hợp biên...
+
+  Lệch cực nhỏ: 120 | 122, bS=2 -> Kỳ vọng giữ nguyên, không lọc:
+    120 120 120 121  | 121 122 122 122 
+    120 120 120 121  | 121 122 122 122 
+    120 120 120 121  | 121 122 122 122 
+    120 120 120 121  | 121 122 122 122 
+
+----------------------------------------
+>>> DF VP FULL FUNCTIONAL TEST PASSED <<<
+
+
+Info: /OSCI/SystemC: Simulation stopped by user.
+[0;32m[SUCCESS] Khối DF PASSED toàn bộ kịch bản![0m
+
+[1;33m[BUILDING] Đang cập nhật và biên dịch khối MEM...[0m
+CMake Error: Unknown argument -q
+CMake Error: Run 'cmake --help' for all supported options.
+[ 66%] Built target h264_vp_mem
+[100%] Built target test_h264_vp_mem
+[0;34m[TESTING] Đang chạy Unit Test cho khối MEM...[0m
+
+        SystemC 2.3.4-Accellera --- Oct  9 2026 11:00:33
+        Copyright (c) 1996-2022 by all Contributors,
+        ALL RIGHTS RESERVED
+
+==========================
+H.264 MEMORY MAP UNIT TEST
+==========================
+ -> SRAM Ghi/Đọc tại 0x00000100:
+    Data Read : aa bb cc dd 11 22 33 44 
+
+ -> DRAM Ghi/Đọc tại 0x10000500:
+    Data Read : ff ee 99 88 77 66 55 44 
+
+ -> Kiểm tra truy cập sai địa chỉ (0x00080000)...
+Truy cập địa chỉ ngoài vùng nhớ: 0x80000
+    Truy cập địa chỉ ngoài vùng nhớ: 0x80000
+    => Hệ thống báo lỗi Address Error chính xác!
+
+----------------------------------------
+Kiểm tra trường hợp biên...
+
+Stress Test 100 giao dịch Back-to-back 0ns...
+ -> Hoàn tất 100 giao dịch Back-to-back 0ns delay thành công không bị rớt gói!
+----------------------------------------
+>>> MEMORY MAP VP FULL FUNCTIONAL TEST PASSED <<<
+
+
+Info: /OSCI/SystemC: Simulation stopped by user.
+[0;32m[SUCCESS] Khối MEM PASSED toàn bộ kịch bản![0m
+
+[0;32m==================================================[0m
+[0;32m ĐÃ BUILD VÀ TEST THÀNH CÔNG 4 KHỐI (TQ, EC, DF, MEM) [0m
+[0;32m==================================================[0m

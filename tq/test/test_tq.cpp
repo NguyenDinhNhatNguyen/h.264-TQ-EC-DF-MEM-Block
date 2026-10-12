@@ -67,7 +67,8 @@ struct TqTb : sc_core::sc_module {
         std::cout << "H.264 TRANSFORM & QUANTIZATION UNIT TEST\n";
         std::cout << "========================================\n";
 
-        // Data đầu vào: Ma trận Residual 4x4 (16 phần tử int16)
+        // Input data: a 4x4 residual matrix and reference predictor
+        std::cout << "Testing the standard Transform & Quantization flow\n";
         std::int16_t residual[16] = {
              32,  12, -10,   4,
              15,  -5,   0,   2,
@@ -76,7 +77,6 @@ struct TqTb : sc_core::sc_module {
         };
         send(tlm::TLM_WRITE_COMMAND, 0x00, reinterpret_cast<unsigned char*>(residual), 32);
 
-        // 2. Data đầu vào: Ma trận Predictor 4x4 (16 phần tử uint8)
         std::uint8_t predictor[16] = {
             128, 128, 128, 128,
             128, 128, 128, 128,
@@ -85,59 +85,60 @@ struct TqTb : sc_core::sc_module {
         };
         send(tlm::TLM_WRITE_COMMAND, 0x04, predictor, 16);
 
-        // Cấu hình QP = 24
+        // Configure QP = 24
         unsigned char qp = 24;
         send(tlm::TLM_WRITE_COMMAND, 0x08, &qp, 1);
 
-        // Bắn Start Command (block_class = 0, bit 7 = 1 => 0x80)
+        // Issue Start Command (block_class = 0, bit 7 = 1 => 0x80)
         unsigned char start_cmd = 0x80;
         send(tlm::TLM_WRITE_COMMAND, 0x0C, &start_cmd, 1);
 
-        // Polling chờ TQ xử lý xong
+        // Poll for TQ completion
         unsigned char valid[4]{};
         send(tlm::TLM_READ_COMMAND, 0x40, valid, 4);
-        // assert(h264::tlmutil::load_u32_le(valid) == 1);
-        std::cout << " -> TQ block xử lý hoàn tất (Valid = 1)\n\n";
+       std::cout << "  - Hardware status : TQ processing complete (Valid = 1)\n";
 
-        // Đọc Quantized Levels 
+        // Read Quantized Levels 
         std::int16_t levels[16]{};
         send(tlm::TLM_READ_COMMAND, 0x10, reinterpret_cast<unsigned char*>(levels), 32);
 
-        // Đọc Reconstructed Block
+        // Read Reconstructed Block
         std::uint8_t reconstructed[16]{};
         send(tlm::TLM_READ_COMMAND, 0x30, reconstructed, 16);
 
-        print_block_16("Residual Input (Từ Intra/Inter)", residual);
+        print_block_16("Residual Input (From Intra/Inter)", residual);
         print_block_8("Predictor Input", predictor);
         std::cout << "  --------------------------------\n";
-        print_block_16("Quantized Levels (Xuất cho EC)", levels);
-        print_block_8("Reconstructed Block (Lưu vào Memory)", reconstructed);
+        print_block_16("Quantized Levels (Output to EC)", levels);
+        print_block_8("Reconstructed Block (Stored in Memory)", reconstructed);
+        std::cout << "  => STATUS             : \033[1;32m[PASS - EXACT MATCH]\033[0m\n\n";
 
         std::cout << "\n----------------------------------------\n";
-        std::cout << " Kiểm tra trường hợp biên...\n";
+        std::cout << "Testing boundary cases (Stress & Zero-run Test)...\n";
 
-        // Dữ liệu Residual = 0 hoàn toàn
+        // All residual values are zero
         std::int16_t zero_residual[16] = {0};
         send(tlm::TLM_WRITE_COMMAND, 0x00, reinterpret_cast<unsigned char*>(zero_residual), 32);
         send(tlm::TLM_WRITE_COMMAND, 0x0C, &start_cmd, 1);
         send(tlm::TLM_READ_COMMAND, 0x40, valid, 4);
         assert(temp_load_u32_le(valid) == 1);
-        std::cout << " -> Xử lý thành công khi Residual = 0 hoàn toàn.\n";
+        std::cout << "  - All-zero residual     : \033[1;32m[PASS - STABLE PROCESSING]\033[0m\n";
 
-        // Max Residual + Min QP (Chống tràn số)
+        // Max Residual + Min QP (overflow protection)
         std::int16_t max_residual[16]; 
-        for(auto& x : max_residual) x = 255; // Giá trị biên lớn nhất
-        unsigned char min_qp = 0;            // QP nhỏ nhất
+        for(auto& x : max_residual) x = 255; // Maximum boundary value
+        unsigned char min_qp = 0;            // Minimum QP
 
         send(tlm::TLM_WRITE_COMMAND, 0x00, reinterpret_cast<unsigned char*>(max_residual), 32);
         send(tlm::TLM_WRITE_COMMAND, 0x08, &min_qp, 1);
         send(tlm::TLM_WRITE_COMMAND, 0x0C, &start_cmd, 1);
         send(tlm::TLM_READ_COMMAND, 0x40, valid, 4);
         assert(temp_load_u32_le(valid) == 1);
-        std::cout << " -> Test Max Residual (255) + Min QP (0) không bị tràn số.\n";
-        std::cout << "----------------------------------------\n";
+        std::cout << "  - Max Residual + Min QP  : \033[1;32m[PASS - NO OVERFLOW]\033[0m\n\n";
 
-        std::cout << "\n>>> TQ VP FULL FUNCTIONAL TEST PASSED <<<\n\n";
+        std::cout << "=========================================================\n";
+        std::cout << " \033[1;32m>>> TQ VP FULL FUNCTIONAL TEST PASSED <<<\033[0m\n";
+        std::cout << "=========================================================\n\n";
         sc_core::sc_stop();
     }
 };

@@ -1,2 +1,0 @@
-/usr/bin/ar qc libh264_vp_df.a "CMakeFiles/h264_vp_df.dir/mnt/d/CDC-VP/components/h264/df/src/df_top.cpp.o" "CMakeFiles/h264_vp_df.dir/mnt/d/CDC-VP/components/h264/df/src/df_line_mem.cpp.o" "CMakeFiles/h264_vp_df.dir/mnt/d/CDC-VP/components/h264/df/src/df_filter.cpp.o"
-/usr/bin/ranlib libh264_vp_df.a

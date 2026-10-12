@@ -27,46 +27,82 @@ struct MemTb : sc_core::sc_module {
         socket->b_transport(tx, delay);
         
         if (tx.get_response_status() != tlm::TLM_OK_RESPONSE) {
-            std::cout << "\nGiao dịch bị từ chối - Address: 0x" << std::hex << addr << std::dec << "\n";
+            std::cout << "\nTransaction rejected - Address: 0x" << std::hex << addr << std::dec << "\n";
             sc_core::sc_stop();
         }
         wait(delay);
     }
 
     void run() {
-        std::cout << "\n==========================\n";
-        std::cout << "H.264 MEMORY MAP UNIT TEST\n";
-        std::cout << "==========================\n";
+        std::cout << "\n=========================================================\n";
+        std::cout << "          H.264 MEMORY MAP UNIT TEST REPORT              \n";
+        std::cout << "=========================================================\n\n";
 
-        // Test Internal Memory (SRAM) <=> Ghi và đọc lại ở địa chỉ 0x00000100
+        // Test Internal Memory (SRAM): write and read back at address 0x00000100
+        std::cout << "Testing the SRAM region (Internal Memory)\n";
         std::uint8_t write_sram[8] = {0xAA, 0xBB, 0xCC, 0xDD, 0x11, 0x22, 0x33, 0x44};
         std::uint8_t read_sram[8] = {0};
         
-        send(tlm::TLM_WRITE_COMMAND, 0x00000100, write_sram, 8);
-        send(tlm::TLM_READ_COMMAND,  0x00000100, read_sram, 8);
+        std::uint32_t sram_addr = 0x00000100;
+        send(tlm::TLM_WRITE_COMMAND, sram_addr, write_sram, 8);
+        send(tlm::TLM_READ_COMMAND,  sram_addr, read_sram, 8);
         
-        std::cout << " -> SRAM Ghi/Đọc tại 0x00000100:\n    Data Read : ";
-        for (int i = 0; i < 8; ++i) std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)read_sram[i] << " ";
-        std::cout << std::dec << "\n\n";
+        std::cout << "  - Test address    : 0x" << std::hex << sram_addr << std::dec << "\n";
+        std::cout << "  - Written data    : ";
+        for (int i = 0; i < 8; ++i) std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0') << (int)write_sram[i] << " ";
+        std::cout << std::dec << "\n";
 
-        // Test External Memory (DRAM) <= Ghi và đọc lại ở địa chỉ 0x10000500
+        std::cout << "  - Read data       : ";
+        for (int i = 0; i < 8; ++i) std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0') << (int)read_sram[i] << " ";
+        std::cout << std::dec << "\n";
+
+        bool sram_match = true;
+        for(int i=0; i<8; ++i) if(write_sram[i] != read_sram[i]) sram_match = false;
+        
+        if (sram_match) {
+            std::cout << "  => STATUS         : \033[1;32m[PASS - EXACT MATCH]\033[0m\n\n";
+        } else {
+            std::cout << "  => STATUS         : \033[1;31m[FAIL - DATA MISMATCH]\033[0m\n\n";
+            sc_core::sc_stop();
+        }
+
+        // Test External Memory (DRAM): write and read back at address 0x10000500
+        std::cout << "Testing the DRAM region (External Memory)\n";
         std::uint8_t write_dram[8] = {0xFF, 0xEE, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44};
         std::uint8_t read_dram[8] = {0};
         
-        send(tlm::TLM_WRITE_COMMAND, 0x10000500, write_dram, 8);
-        send(tlm::TLM_READ_COMMAND,  0x10000500, read_dram, 8);
+        std::uint32_t dram_addr = 0x10000500;
+        send(tlm::TLM_WRITE_COMMAND, dram_addr, write_dram, 8);
+        send(tlm::TLM_READ_COMMAND,  dram_addr, read_dram, 8);
         
-        std::cout << " -> DRAM Ghi/Đọc tại 0x10000500:\n    Data Read : ";
-        for (int i = 0; i < 8; ++i) std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)read_dram[i] << " ";
-        std::cout << std::dec << "\n\n";
+        std::cout << "  - Test address    : 0x" << std::hex << dram_addr << std::dec << "\n";
+        std::cout << "  - Written data    : ";
+        for (int i = 0; i < 8; ++i) std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0') << (int)write_dram[i] << " ";
+        std::cout << std::dec << "\n";
+    
+        std::cout << "  - Read data       : ";
+        for (int i = 0; i < 8; ++i) std::cout << "0x" << std::hex << std::setw(2) << std::setfill('0') << (int)read_dram[i] << " ";
+        std::cout << std::dec << "\n";
 
-        //Test lỗi tràn địa chỉ <= Truy cập vào khoảng trống giữa SRAM và DRAM)
-        std::cout << " -> Kiểm tra truy cập sai địa chỉ (0x00080000)...\n";
-        std::uint8_t dummy = 0;
+        bool dram_match = true;
+        for(int i=0; i<8; ++i) if(write_dram[i] != read_dram[i]) dram_match = false;
+
+        if (dram_match) {
+            std::cout << "  => STATUS         : \033[1;32m[PASS - EXACT MATCH]\033[0m\n\n";
+        } else {
+            std::cout << "  => STATUS         : \033[1;31m[FAIL - DATA MISMATCH]\033[0m\n\n";
+            sc_core::sc_stop();
+        }
+
+        // Test invalid addresses: access the gap between SRAM and DRAM
+        std::cout << "Testing unmapped memory protection (Invalid Address)\n";
+        std::uint32_t invalid_addr = 0x00080000;
+        std::cout << "  - Deliberate access: 0x" << std::hex << invalid_addr << std::dec << " (Gap between SRAM and DRAM)\n";
         
+        std::uint8_t dummy = 0;
         tlm::tlm_generic_payload tx;
         tx.set_command(tlm::TLM_WRITE_COMMAND); 
-        tx.set_address(0x00080000); 
+        tx.set_address(invalid_addr); 
         tx.set_data_ptr(&dummy); 
         tx.set_data_length(1); 
         tx.set_streaming_width(1);
@@ -79,21 +115,24 @@ struct MemTb : sc_core::sc_module {
         socket->b_transport(tx, delay);
         
         if (tx.get_response_status() == tlm::TLM_ADDRESS_ERROR_RESPONSE) {
-            std::cout << "    Truy cập địa chỉ ngoài vùng nhớ: 0x80000\n";
-            std::cout << "    => Hệ thống báo lỗi Address Error chính xác!\n\n";
+            std::cout << "  - Hardware response: TLM_ADDRESS_ERROR_RESPONSE detected\n";
+            std::cout << "  => STATUS         : \033[1;32m[PASS - INVALID ACCESS BLOCKED]\033[0m\n\n";
+        } else {
+            std::cout << "  => STATUS         : \033[1;31m[FAIL - ADDRESS ERROR NOT DETECTED]\033[0m\n\n";
+            sc_core::sc_stop();
         }
 
-std::cout << "----------------------------------------\n";
-        std::cout << "Kiểm tra trường hợp biên...\n\n";
-        std::cout << "Stress Test 100 giao dịch Back-to-back 0ns...\n";
+        std::cout << "----------------------------------------\n";
+        std::cout << "Testing boundary cases...\n\n";
+        std::cout << "Stress Test: 100 back-to-back transactions at 0ns...\n";
         
         bool back_to_back_passed = true;
         for (int i = 0; i < 100; ++i) {
-            std::uint32_t addr = 0x00000300 + (i * 4); // Nhảy 4 bytes mỗi vòng lặp
+            std::uint32_t addr = 0x00000300 + (i * 4); // Advance 4 bytes per iteration
             std::uint32_t val_write = 0xCAFEBABE + i;
             std::uint32_t val_read = 0;
             
-            // Giao dịch WRITE trực tiếp không wait()
+            // Direct WRITE transaction without wait()
             tlm::tlm_generic_payload tx_w;
             tx_w.set_command(tlm::TLM_WRITE_COMMAND); tx_w.set_address(addr); 
             tx_w.set_data_ptr(reinterpret_cast<unsigned char*>(&val_write));
@@ -103,7 +142,7 @@ std::cout << "----------------------------------------\n";
             sc_core::sc_time delay_w = sc_core::SC_ZERO_TIME;
             socket->b_transport(tx_w, delay_w);
 
-            // Giao dịch READ trực tiếp nối đuôi không wait()
+            // Immediately following direct READ transaction without wait()
             tlm::tlm_generic_payload tx_r;
             tx_r.set_command(tlm::TLM_READ_COMMAND); tx_r.set_address(addr); 
             tx_r.set_data_ptr(reinterpret_cast<unsigned char*>(&val_read));
@@ -115,17 +154,22 @@ std::cout << "----------------------------------------\n";
             
             if (val_write != val_read || tx_w.get_response_status() != tlm::TLM_OK_RESPONSE) {
                 back_to_back_passed = false;
-                std::cout << "    Rớt gói tại địa chỉ: 0x" << std::hex << addr << std::dec << "\n";
+                std::cout << "    Transfer dropped at iteration " << i << ", address: 0x" << std::hex << addr << std::dec << "\n";
                 break;
             }
         }
         
         if (back_to_back_passed) {
-            std::cout << " -> Hoàn tất 100 giao dịch Back-to-back 0ns delay thành công không bị rớt gói!\n";
+            std::cout << "  - Successfully executed 100/100 consecutive Write/Read pairs.\n";
+            std::cout << "  => STATUS         : \033[1;32m[PASS - BUS STABLE]\033[0m\n\n";
+        } else {
+            std::cout << "  => STATUS         : \033[1;31m[FAIL - BUS HANG OR DROPPED TRANSFER]\033[0m\n\n";
+            sc_core::sc_stop();
         }
-        std::cout << "----------------------------------------\n";
 
-        std::cout << ">>> MEMORY MAP VP FULL FUNCTIONAL TEST PASSED <<<\n\n";
+        std::cout << "=========================================================\n";
+        std::cout << " \033[1;32m>>> MEMORY MAP VP FULL FUNCTIONAL TEST PASSED <<<\033[0m\n";
+        std::cout << "=========================================================\n\n";
         sc_core::sc_stop();
     }
 };

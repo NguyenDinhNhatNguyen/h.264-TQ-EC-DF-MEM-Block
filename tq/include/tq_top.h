@@ -18,7 +18,11 @@ public:
     explicit TqTop(sc_core::sc_module_name name);
     const TqResult& result() const { return result_; }
 
+    void reset(); 
 private:
+    unsigned loaded_ = 0;
+    bool is_intra_ = true;
+
     TqRequest request_{};
     TqResult result_{};
 
